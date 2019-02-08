@@ -1,9 +1,12 @@
 package com.example.myapplication123;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -27,11 +30,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
+import org.tensorflow.lite.Interpreter;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,12 +59,17 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     // PICK_PHOTO_CODE is a constant integer
     public final static int PICK_PHOTO_CODE = 1046;
+    private static final int IMAGE_MEAN = 128;
+    private static final float IMAGE_STD = 128.0f;
+    private static final int INPUT_SIZE = 192;
+    private int BATCH_SIZE = 3;
+    private static final int PIXEL_SIZE = 3;
 
     static {
         System.loadLibrary("tensorflow_inference");
     }
 
-    private static final String MODEL_FILE = "file:///android_asset/model_2.pb";
+    private static final String MODEL_FILE = "file:///android_asset/m.tflite";
 
 
 
@@ -82,59 +103,33 @@ public class MainActivity extends AppCompatActivity {
 
         public Bitmap predict(Bitmap bitmap, String modelName, AssetManager assets) {
             double t1 = System.currentTimeMillis();
-            // Import the model
-            TensorFlowInferenceInterface inferenceInterface = new TensorFlowInferenceInterface(assets, modelName);
-//            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-//            int INPUT_SIZE = 224;
-            int INPUT_SIZE = 192;
-            int BATCH_SIZE = 4;
+            try {
+            Interpreter tflite = new Interpreter(loadModelFile());
+            int[] dims = new int[] {BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, PIXEL_SIZE};
+            tflite.resizeInput(0, dims);
             int diff = BATCH_SIZE;
             for(int a=BATCH_SIZE; a<= 30; a = a+diff) {
-//            String INPUT_NAME = "input_1";
-//            String OUTPUT = "reshape_2/Reshape";
-                String INPUT_NAME = "input_4";
-                String OUTPUT = "batch_normalization_17/FusedBatchNorm_1";
-                String[] OUTPUT_NAMES = {OUTPUT};
-                int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
-                float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
-                int IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
-//            ArrayList<Bitmap> results = new ArrayList<Bitmap>();
-
-//            Bitmap bitmap = Bitmap.createScaledBitmap(pic, INPUT_SIZE, INPUT_SIZE, true);
-//            int l1 = bitmaps.size();
-//            for(int k=0; k<l1; ++k) {
-//            Bitmap bitmap = bitmaps.get(k);
-                bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-                for (int k = 0; k < BATCH_SIZE; ++k) {
-                    int N = IMAGE_START * k;
-                    for (int j = 0; j < intValues.length; ++j) {
-                        final int val = intValues[j];
-
-                        floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
-                        floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
-                        floatValues[N + j * 3 + 2] = (val & 0xFF);
-
-                        floatValues[N + j * 3 + 2] = Color.red(val);
-                        floatValues[N + j * 3 + 1] = Color.green(val);
-                        floatValues[N + j * 3] = Color.blue(val);
-
+                /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
+                ByteBuffer imgData = convertBitmapToByteBuffer(bitmap);
+                // 0xff000000 | (R << 16) | (G << 8) | B;
+                float[][][][] result = new float[BATCH_SIZE][INPUT_SIZE][INPUT_SIZE][PIXEL_SIZE];
+//                Map<Integer, Object> outputs = new HashMap<Integer, Object>();
+//                outputs.put(0, result);
+                int[] intValues = new int[INPUT_SIZE*INPUT_SIZE];
+//                Object[] inputs = new Object[]{imgData};
+                tflite.run(imgData, result);
+                int idx = 0;
+                for(int k =0; k<1; ++k) {
+                    for (int i = 0; i < INPUT_SIZE; ++i) {
+                        for (int j = 0; j < INPUT_SIZE; ++j) {
+                            int R = (int)result[k][i][j][0];
+                            int G = (int)result[k][i][j][1];
+                            int B = (int)result[k][i][j][2];
+                            intValues[idx] = 0xff000000 | (R) | (G) | B;
+                            idx++;
+                        }
                     }
                 }
-
-                inferenceInterface.feed(INPUT_NAME, floatValues, BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, 3);
-                inferenceInterface.run(OUTPUT_NAMES, false);
-                float[] outputs = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
-                inferenceInterface.fetch(OUTPUT, outputs);
-                int N = 0;
-                for (int i = 0; i < intValues.length; ++i) {
-                    intValues[i] =
-                            0xFF000000
-                                    | (((int) (outputs[N + i * 3] * 255)) << 16)
-                                    | (((int) (outputs[N + i * 3 + 1] * 255)) << 8)
-                                    | ((int) (outputs[N + i * 3 + 2] * 255));
-                }
-//            bitmap.setPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
                 bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
                 if(a+diff > 30){
                     diff = a+diff - 30;
@@ -143,40 +138,70 @@ public class MainActivity extends AppCompatActivity {
             double t2 = System.currentTimeMillis();
             double difference = (t2 - t1)/1000;
             Log.i("Time: ", " in secs: " + difference);
-            System.out.println("Secs: " + difference);
+            System.out.println("Batch Size: " + BATCH_SIZE + "  Secs: " + difference);
+            } catch(Exception ex){
+                Log.w("WARNING: ", ex);
+            }
             return bitmap;
 
-//            results.add(bitmap);
-//            }
-
-//            imageView.setImageBitmap(bitmap);
-//            return results;
         }
 
         @Override
         protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
-
-            //used to control the number of decimals places for the output probability
-//            DecimalFormat df2 = new DecimalFormat(".##");
-
-            //transfer the neural network output to an array
-//            double[] results = {result.getDouble(0,0),result.getDouble(0,1),result.getDouble(0,2),
-//                    result.getDouble(0,3),result.getDouble(0,4),result.getDouble(0,5),result.getDouble(0,6),
-//                    result.getDouble(0,7),result.getDouble(0,8),result.getDouble(0,9),};
-//            float val = arrayMaximum(result);
-//            int idx = getIndexOfLargestValue(result);
-//            Log.i("result :  ",idx + "  " + val);
-            //find the UI tvs to display the prediction and confidence values
-//            txt = (TextView)findViewById(R.id.txt);
-
-            //display the values using helper functions defined below
-//            txt.setText(idx + "  " + val);
-//            out1.setText(String.valueOf(getIndexOfLargestValue(results)));
-//            for(int i=0;i<results.size();++i) {
                 imageView.setImageBitmap(result);
-//                SystemClock.sleep(1000);
-//            }
+        }
+
+        private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
+//            ByteBuffer[] byteBuffer = new ByteBuffer[BATCH_SIZE];
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * PIXEL_SIZE);
+            int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
+            bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+            int pixel = 0;
+            for(int k =0; k<BATCH_SIZE; ++k) {
+
+//                byteBuffer[k] = ByteBuffer.allocateDirect(4*BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * PIXEL_SIZE);
+//                byteBuffer[k].order(ByteOrder.nativeOrder());
+
+                for (int i = 0; i < INPUT_SIZE; ++i) {
+                    for (int j = 0; j < INPUT_SIZE; ++j) {
+                        final int val = intValues[i*INPUT_SIZE  + j];
+                        byteBuffer.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD); //R
+                        byteBuffer.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD); //G
+                        byteBuffer.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD); // B
+
+//                        byteBuffer[k].putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD); //R
+//                        byteBuffer[k].putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD); //G
+//                        byteBuffer[k].putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD); // B
+
+
+//                        byteBuffer.put((byte) ((val >> 16) & 0xFF));
+//                        byteBuffer.put((byte) ((val >> 8) & 0xFF));
+//                        byteBuffer.put((byte) (val & 0xFF));
+                    }
+                }
+            }
+            return byteBuffer;
+        }
+
+        private FileDescriptor openFile(String path)
+                throws FileNotFoundException, IOException {
+            File file = new File(path);
+            FileOutputStream fos = new FileOutputStream(file);
+            // remember th 'fos' reference somewhere for later closing it
+            fos.write((new Date() + " Beginning of process...").getBytes());
+            return fos.getFD();
+        }
+
+        /** Memory-map the model file in Assets. */
+        private MappedByteBuffer loadModelFile() throws IOException {
+            String Model = "m.tflite";
+            AssetFileDescriptor fileDescriptor = getAssets().openFd(Model);
+            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+            FileChannel fileChannel = inputStream.getChannel();
+            long startOffset = fileDescriptor.getStartOffset();
+            long declaredLength = fileDescriptor.getDeclaredLength();
+            return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
         }
 
         //helper class to return the largest value in the output array
