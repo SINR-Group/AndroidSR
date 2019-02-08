@@ -2,9 +2,11 @@ package com.example.myapplication123;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -29,8 +31,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
+//import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import org.tensorflow.lite.Interpreter;
+//import org.tensorflow.lite.experimental.GpuDelegate;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -50,6 +53,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+
+
 public class MainActivity extends AppCompatActivity {
 
     public Bitmap imageBitmap;
@@ -62,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int IMAGE_MEAN = 128;
     private static final float IMAGE_STD = 128.0f;
     private static final int INPUT_SIZE = 192;
-    private int BATCH_SIZE = 3;
+    private int BATCH_SIZE = 1;
     private static final int PIXEL_SIZE = 3;
 
     static {
@@ -103,42 +108,55 @@ public class MainActivity extends AppCompatActivity {
 
         public Bitmap predict(Bitmap bitmap, String modelName, AssetManager assets) {
             double t1 = System.currentTimeMillis();
+            final ActivityManager activityManager =
+                    (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            final ConfigurationInfo configurationInfo =
+                    activityManager.getDeviceConfigurationInfo();
+            System.err.println(Double.parseDouble(configurationInfo.getGlEsVersion()));
+            System.err.println(configurationInfo.reqGlEsVersion >= 0x30000);
+            System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
+
             try {
-            Interpreter tflite = new Interpreter(loadModelFile());
-            int[] dims = new int[] {BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, PIXEL_SIZE};
-            tflite.resizeInput(0, dims);
-            int diff = BATCH_SIZE;
-            for(int a=BATCH_SIZE; a<= 30; a = a+diff) {
-                /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
-                ByteBuffer imgData = convertBitmapToByteBuffer(bitmap);
-                // 0xff000000 | (R << 16) | (G << 8) | B;
-                float[][][][] result = new float[BATCH_SIZE][INPUT_SIZE][INPUT_SIZE][PIXEL_SIZE];
-//                Map<Integer, Object> outputs = new HashMap<Integer, Object>();
-//                outputs.put(0, result);
-                int[] intValues = new int[INPUT_SIZE*INPUT_SIZE];
-//                Object[] inputs = new Object[]{imgData};
-                tflite.run(imgData, result);
-                int idx = 0;
-                for(int k =0; k<1; ++k) {
-                    for (int i = 0; i < INPUT_SIZE; ++i) {
-                        for (int j = 0; j < INPUT_SIZE; ++j) {
-                            int R = (int)result[k][i][j][0];
-                            int G = (int)result[k][i][j][1];
-                            int B = (int)result[k][i][j][2];
-                            intValues[idx] = 0xff000000 | (R) | (G) | B;
-                            idx++;
+                // NEW: Prepare GPU delegate.
+//                GpuDelegate delegate = new GpuDelegate();
+//                Interpreter.Options options = (new Interpreter.Options()).addDelegate(delegate);
+                Interpreter tflite = new Interpreter(loadModelFile());
+                int[] dims = new int[] {BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, PIXEL_SIZE};
+                tflite.resizeInput(0, dims);
+                int diff = BATCH_SIZE;
+                for(int a=BATCH_SIZE; a<= 30; a = a+diff) {
+                    /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
+                    ByteBuffer imgData = convertBitmapToByteBuffer(bitmap);
+                    // 0xff000000 | (R << 16) | (G << 8) | B;
+                    float[][][][] result = new float[BATCH_SIZE][INPUT_SIZE][INPUT_SIZE][PIXEL_SIZE];
+    //                Map<Integer, Object> outputs = new HashMap<Integer, Object>();
+    //                outputs.put(0, result);
+                    int[] intValues = new int[INPUT_SIZE*INPUT_SIZE];
+    //                Object[] inputs = new Object[]{imgData};
+                    tflite.run(imgData, result);
+                    int idx = 0;
+                    for(int k =0; k<1; ++k) {
+                        for (int i = 0; i < INPUT_SIZE; ++i) {
+                            for (int j = 0; j < INPUT_SIZE; ++j) {
+                                int R = (int)result[k][i][j][0];
+                                int G = (int)result[k][i][j][1];
+                                int B = (int)result[k][i][j][2];
+                                intValues[idx] = 0xff000000 | (R) | (G) | B;
+                                idx++;
+                            }
                         }
                     }
+                    bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
+                    if(a+diff > 30){
+                        diff = a+diff - 30;
+                    }
                 }
-                bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
-                if(a+diff > 30){
-                    diff = a+diff - 30;
-                }
-            }
-            double t2 = System.currentTimeMillis();
-            double difference = (t2 - t1)/1000;
-            Log.i("Time: ", " in secs: " + difference);
-            System.out.println("Batch Size: " + BATCH_SIZE + "  Secs: " + difference);
+                // Clean up
+//                delegate.close();
+                double t2 = System.currentTimeMillis();
+                double difference = (t2 - t1)/1000;
+                Log.i("Time: ", " in secs: " + difference);
+                System.out.println("Batch Size: " + BATCH_SIZE + "  Secs: " + difference);
             } catch(Exception ex){
                 Log.w("WARNING: ", ex);
             }
