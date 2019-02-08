@@ -1,6 +1,7 @@
 package com.example.myapplication123;
 
 import android.Manifest;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,12 +26,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.bytedeco.javacv.FrameFilter;
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 import java.text.DecimalFormat;
-
-
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -79,54 +81,76 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public Bitmap predict(Bitmap bitmap, String modelName, AssetManager assets) {
-
+            double t1 = System.currentTimeMillis();
             // Import the model
             TensorFlowInferenceInterface inferenceInterface = new TensorFlowInferenceInterface(assets, modelName);
-
+//            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 //            int INPUT_SIZE = 224;
             int INPUT_SIZE = 192;
+            int BATCH_SIZE = 4;
+            int diff = BATCH_SIZE;
+            for(int a=BATCH_SIZE; a<= 30; a = a+diff) {
 //            String INPUT_NAME = "input_1";
 //            String OUTPUT = "reshape_2/Reshape";
-            String INPUT_NAME = "input_4";
-            String OUTPUT = "batch_normalization_17/FusedBatchNorm_1";
-            String[] OUTPUT_NAMES = {OUTPUT};
-            int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
-            float[] floatValues = new float[INPUT_SIZE * INPUT_SIZE * 3];
+                String INPUT_NAME = "input_4";
+                String OUTPUT = "batch_normalization_17/FusedBatchNorm_1";
+                String[] OUTPUT_NAMES = {OUTPUT};
+                int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
+                float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
+                int IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
+//            ArrayList<Bitmap> results = new ArrayList<Bitmap>();
 
 //            Bitmap bitmap = Bitmap.createScaledBitmap(pic, INPUT_SIZE, INPUT_SIZE, true);
+//            int l1 = bitmaps.size();
+//            for(int k=0; k<l1; ++k) {
+//            Bitmap bitmap = bitmaps.get(k);
+                bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
-            bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+                for (int k = 0; k < BATCH_SIZE; ++k) {
+                    int N = IMAGE_START * k;
+                    for (int j = 0; j < intValues.length; ++j) {
+                        final int val = intValues[j];
 
-            for (int j = 0; j < intValues.length; ++j) {
-                final int val = intValues[j];
+                        floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
+                        floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
+                        floatValues[N + j * 3 + 2] = (val & 0xFF);
 
-                floatValues[j * 3 + 0] = ((val >> 16) & 0xFF);
-                floatValues[j * 3 + 1] = ((val >> 8) & 0xFF);
-                floatValues[j * 3 + 2] = (val & 0xFF);
+                        floatValues[N + j * 3 + 2] = Color.red(val);
+                        floatValues[N + j * 3 + 1] = Color.green(val);
+                        floatValues[N + j * 3] = Color.blue(val);
 
-                floatValues[j * 3 + 2] = Color.red(val);
-                floatValues[j * 3 + 1] = Color.green(val);
-                floatValues[j * 3] = Color.blue(val);
+                    }
+                }
 
-            }
-
-            inferenceInterface.feed(INPUT_NAME, floatValues,  1, INPUT_SIZE, INPUT_SIZE, 3);
-            inferenceInterface.run(OUTPUT_NAMES, false);
-            float[] outputs = new float[INPUT_SIZE * INPUT_SIZE * 3];
-            inferenceInterface.fetch(OUTPUT, outputs);
-
-            for (int i = 0; i < intValues.length; ++i) {
-                intValues[i] =
-                        0xFF000000
-                                | (((int) (floatValues[i * 3] * 255)) << 16)
-                                | (((int) (floatValues[i * 3 + 1] * 255)) << 8)
-                                | ((int) (floatValues[i * 3 + 2] * 255));
-            }
+                inferenceInterface.feed(INPUT_NAME, floatValues, BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, 3);
+                inferenceInterface.run(OUTPUT_NAMES, false);
+                float[] outputs = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
+                inferenceInterface.fetch(OUTPUT, outputs);
+                int N = 0;
+                for (int i = 0; i < intValues.length; ++i) {
+                    intValues[i] =
+                            0xFF000000
+                                    | (((int) (outputs[N + i * 3] * 255)) << 16)
+                                    | (((int) (outputs[N + i * 3 + 1] * 255)) << 8)
+                                    | ((int) (outputs[N + i * 3 + 2] * 255));
+                }
 //            bitmap.setPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-            bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
+                bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
+                if(a+diff > 30){
+                    diff = a+diff - 30;
+                }
+            }
+            double t2 = System.currentTimeMillis();
+            double difference = (t2 - t1)/1000;
+            Log.i("Time: ", " in secs: " + difference);
+            System.out.println("Secs: " + difference);
+            return bitmap;
+
+//            results.add(bitmap);
+//            }
 
 //            imageView.setImageBitmap(bitmap);
-            return bitmap;
+//            return results;
         }
 
         @Override
@@ -149,7 +173,10 @@ public class MainActivity extends AppCompatActivity {
             //display the values using helper functions defined below
 //            txt.setText(idx + "  " + val);
 //            out1.setText(String.valueOf(getIndexOfLargestValue(results)));
-            imageView.setImageBitmap(result);
+//            for(int i=0;i<results.size();++i) {
+                imageView.setImageBitmap(result);
+//                SystemClock.sleep(1000);
+//            }
         }
 
         //helper class to return the largest value in the output array
@@ -176,6 +203,17 @@ public class MainActivity extends AppCompatActivity {
 //        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 //        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 //            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//        }
+//        Intent intent = new Intent(Intent.ACTION_PICK);
+//        intent.setType("image/*");
+//        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+//        if (intent.resolveActivity(getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+//            startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_PHOTO_CODE);
 //        }
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
@@ -205,16 +243,35 @@ public class MainActivity extends AppCompatActivity {
 //        imageBitmap = (Bitmap) extras.get("data");
         Uri photoUri = data.getData();
         try {
-            // Do something with the photo based on Uri
+//            // Do something with the photo based on Uri
             Bitmap bmp = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
             imageBitmap = Bitmap.createScaledBitmap(bmp, 192, 192, true);
         } catch (Exception ex){
             Log.e("Error", "Exception : ",ex);
         }
         imageView.setImageBitmap(imageBitmap);
-        AsyncTaskRunner runner = new AsyncTaskRunner();
-        runner.execute(imageBitmap);
-        Log.i("info", "xys");
+//        if (data.getClipData() != null) {
+//            ClipData mClipData = data.getClipData();
+//            ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
+//            ArrayList<Bitmap> lbmp = new ArrayList<Bitmap>();
+//            for (int i = 0; i < mClipData.getItemCount(); i++) {
+//                ClipData.Item item = mClipData.getItemAt(i);
+//                Uri uri = item.getUri();
+//                mArrayUri.add(uri);
+//                Bitmap bmp;
+//                try {
+//                    // !! You may need to resize the image if it's too large
+//                    bmp = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+//                    bmp = Bitmap.createScaledBitmap(bmp, 192, 192, true);
+//                    lbmp.add(bmp);
+//                } catch (Exception ex){
+//                    Log.e("Error", "Exception : ",ex);
+//                }
+//            }
+            AsyncTaskRunner runner = new AsyncTaskRunner();
+            runner.execute(imageBitmap);
+//        }
+
 //        }
     }
 
