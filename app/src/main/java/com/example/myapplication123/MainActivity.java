@@ -32,6 +32,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -81,76 +82,75 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public Bitmap predict(Bitmap bitmap, String modelName, AssetManager assets) {
-            double t1 = System.currentTimeMillis();
             // Import the model
             TensorFlowInferenceInterface inferenceInterface = new TensorFlowInferenceInterface(assets, modelName);
-//            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-//            int INPUT_SIZE = 224;
             int INPUT_SIZE = 192;
-            int BATCH_SIZE = 4;
-            int diff = BATCH_SIZE;
-            for(int a=BATCH_SIZE; a<= 30; a = a+diff) {
-//            String INPUT_NAME = "input_1";
-//            String OUTPUT = "reshape_2/Reshape";
-                String INPUT_NAME = "input_4";
-                String OUTPUT = "batch_normalization_17/FusedBatchNorm_1";
-                String[] OUTPUT_NAMES = {OUTPUT};
-                int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
-                float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
-                int IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
-//            ArrayList<Bitmap> results = new ArrayList<Bitmap>();
+            String INPUT_NAME = "input_4";
+            String OUTPUT = "batch_normalization_17/FusedBatchNorm_1";
+            String[] OUTPUT_NAMES = {OUTPUT};
+            int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
 
-//            Bitmap bitmap = Bitmap.createScaledBitmap(pic, INPUT_SIZE, INPUT_SIZE, true);
-//            int l1 = bitmaps.size();
-//            for(int k=0; k<l1; ++k) {
-//            Bitmap bitmap = bitmaps.get(k);
-                bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+            int IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
+            bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+            int BS = 4;
 
-                for (int k = 0; k < BATCH_SIZE; ++k) {
-                    int N = IMAGE_START * k;
-                    for (int j = 0; j < intValues.length; ++j) {
-                        final int val = intValues[j];
+            Log.i("BS: ", " : " + BS);
+            double total = 0.0;
+            for(int itr=0; itr<10; ++itr) {
+                Log.i("ITR: ", " : " + itr);
+                double stotal = 0.0;
+                int BATCH_SIZE = BS;
+                int diff = BATCH_SIZE;
 
-                        floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
-                        floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
-                        floatValues[N + j * 3 + 2] = (val & 0xFF);
+                for (int a = BATCH_SIZE; a <= 30; a = a + diff) {
+                    float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
 
-                        floatValues[N + j * 3 + 2] = Color.red(val);
-                        floatValues[N + j * 3 + 1] = Color.green(val);
-                        floatValues[N + j * 3] = Color.blue(val);
+                    for (int k = 0; k < BATCH_SIZE; ++k) {
+                        int N = IMAGE_START * k;
+                        for (int j = 0; j < intValues.length; ++j) {
+                            final int val = intValues[j];
 
+                            floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
+                            floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
+                            floatValues[N + j * 3 + 2] = (val & 0xFF);
+
+                            floatValues[N + j * 3 + 2] = Color.red(val);
+                            floatValues[N + j * 3 + 1] = Color.green(val);
+                            floatValues[N + j * 3] = Color.blue(val);
+
+                        }
+                    }
+
+                    double t1 = System.currentTimeMillis();
+                    inferenceInterface.feed(INPUT_NAME, floatValues, BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, 3);
+                    inferenceInterface.run(OUTPUT_NAMES, false);
+                    float[] outputs = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
+                    inferenceInterface.fetch(OUTPUT, outputs);
+                    double t2 = System.currentTimeMillis();
+                    double difference = (t2 - t1) / 1000;
+                    stotal += difference;
+                    if(BS == 6 && itr == 9) {
+                        int N = 0;
+                        for (int i = 0; i < intValues.length; ++i) {
+                            intValues[i] =
+                                    0xFF000000
+                                            | (((int) (outputs[N + i * 3] * 255)) << 16)
+                                            | (((int) (outputs[N + i * 3 + 1] * 255)) << 8)
+                                            | ((int) (outputs[N + i * 3 + 2] * 255));
+                        }
+                        bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
+                    }
+                    if (a + diff > 30) {
+                        diff = a + diff - 30;
                     }
                 }
-
-                inferenceInterface.feed(INPUT_NAME, floatValues, BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, 3);
-                inferenceInterface.run(OUTPUT_NAMES, false);
-                float[] outputs = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
-                inferenceInterface.fetch(OUTPUT, outputs);
-                int N = 0;
-                for (int i = 0; i < intValues.length; ++i) {
-                    intValues[i] =
-                            0xFF000000
-                                    | (((int) (outputs[N + i * 3] * 255)) << 16)
-                                    | (((int) (outputs[N + i * 3 + 1] * 255)) << 8)
-                                    | ((int) (outputs[N + i * 3 + 2] * 255));
-                }
-//            bitmap.setPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-                bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
-                if(a+diff > 30){
-                    diff = a+diff - 30;
-                }
+                total += stotal;
+                Log.i("Time: ", " in secs: " + stotal);
+                Log.i("Total Time: ", " in secs: " + total);
             }
-            double t2 = System.currentTimeMillis();
-            double difference = (t2 - t1)/1000;
-            Log.i("Time: ", " in secs: " + difference);
-            System.out.println("Secs: " + difference);
+            total = total/10;
+            Log.i("Avg Time: ", " in secs: " + total);
             return bitmap;
-
-//            results.add(bitmap);
-//            }
-
-//            imageView.setImageBitmap(bitmap);
-//            return results;
         }
 
         @Override

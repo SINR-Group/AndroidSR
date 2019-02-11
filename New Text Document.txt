@@ -1,0 +1,77 @@
+S5
+
+Batch Size = 1
+
+Batch Size = 2
+
+Batch Size = 3
+
+Batch Size = 4
+
+Batch Size = 5
+
+Batch Size = 6
+
+
+-----------------------------
+nexus 5 api 23
+
+Batch Size = 1
+I/Time::  in secs: 16.066000000000003
+I/Total Time::  in secs: 150.74
+I/Avg Time::  in secs: 15.074000000000002
+
+Batch Size = 2
+I/Time::  in secs: 16.718
+I/Total Time::  in secs: 166.84999999999997
+I/Avg Time::  in secs: 16.684999999999995
+
+Batch Size = 3
+I/Time::  in secs: 16.068
+I/Total Time::  in secs: 160.707
+I/Avg Time::  in secs: 16.0707
+
+Batch Size = 4
+I/Time::  in secs: 16.98
+I/Total Time::  in secs: 170.109
+I/Avg Time::  in secs: 17.0109
+
+
+//single run
+Batch Size = 5
+I/Time::  in secs: 15.896
+I/Total Time::  in secs: 138.359
+I/Avg Time::  in secs: 13.8359
+
+Batch Size = 6
+
+--------------------------------
+nexus 4 api 22
+
+Batch Size = 1
+I/Time::  in secs: 21.339
+I/Total Time::  in secs: 217.13799999999998
+I/Avg Time::  in secs: 21.7138
+
+Batch Size = 2
+I/Time::  in secs: 23.987999999999996
+I/Total Time::  in secs: 228.986
+I/Avg Time::  in secs: 22.8986
+
+
+Batch Size = 3
+I/Time::  in secs: 23.794
+I/Total Time::  in secs: 227.28600000000003
+I/Avg Time::  in secs: 22.728600000000004
+
+Batch Size = 4
+I/Time::  in secs: 24.947
+I/Total Time::  in secs: 245.29400000000004
+I/Avg Time::  in secs: 24.529400000000003
+
+Batch Size = 5
+I/Time::  in secs: 24.377
+I/Total Time::  in secs: 241.88799999999998
+I/Avg Time::  in secs: 24.188799999999997
+
+Batch Size = 6
