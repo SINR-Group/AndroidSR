@@ -1,24 +1,14 @@
 package com.example.myapplication123;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.ClipData;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.media.Image;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -31,10 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-//import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.experimental.GpuDelegate;
-//import org.tensorflow.lite.experimental.GpuDelegate;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -43,15 +30,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
 
@@ -75,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 //        System.loadLibrary("tensorflow_inference");
 //    }
 
-    private static final String MODEL_FILE = "file:///android_asset/m.tflite";
+    private static final String MODEL_FILE = "m.tflite";
 
 
 
@@ -109,66 +90,73 @@ public class MainActivity extends AppCompatActivity {
 
         public Bitmap predict(Bitmap bitmap, String modelName, AssetManager assets) {
 
-            final ActivityManager activityManager =
-                    (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            final ConfigurationInfo configurationInfo =
-                    activityManager.getDeviceConfigurationInfo();
-            System.err.println(Double.parseDouble(configurationInfo.getGlEsVersion()));
-            System.err.println(configurationInfo.reqGlEsVersion >= 0x30000);
-            System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
+//            final ActivityManager activityManager =
+//                    (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+//            final ConfigurationInfo configurationInfo =
+//                    activityManager.getDeviceConfigurationInfo();
+//            System.err.println(Double.parseDouble(configurationInfo.getGlEsVersion()));
+//            System.err.println(configurationInfo.reqGlEsVersion >= 0x30000);
+//            System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
 
             // NEW: Prepare GPU delegate.
-            GpuDelegate delegate = new GpuDelegate();
-            Interpreter.Options options = (new Interpreter.Options()).addDelegate(delegate);
+//            GpuDelegate delegate = new GpuDelegate();
+//            Interpreter.Options options = (new Interpreter.Options()).addDelegate(delegate);
 
             /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
-            ByteBuffer imgData = convertBitmapToByteBuffer(bitmap);
+            ByteBuffer imgData = convertBitmapToByteBuffer(bitmap, BATCH_SIZE);
 
             double total = 0.0;
             try {
-                Interpreter tflite = new Interpreter(loadModelFile(), options);
-                int[] dims = new int[] {BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, PIXEL_SIZE};
+                Interpreter tflite = new Interpreter(loadModelFile());
+//                int[] dims = new int[] {BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, PIXEL_SIZE};
 //                tflite.resizeInput(0, dims);
-//                tflite.resizeInput(0, dims);
+                Log.i("BATCH SIZE ", "" + BATCH_SIZE);
 
-                int diff = BATCH_SIZE;
+                for(int itr =0; itr<100; ++itr) {
+                    int diff = BATCH_SIZE;
+                    double difference = 0.0;
+                    for (int a = BATCH_SIZE; a <= 30; a = a + diff) {
+                        // 0xff000000 | (R << 16) | (G << 8) | B;
+                        float[][][][] result = new float[diff][INPUT_SIZE][INPUT_SIZE][PIXEL_SIZE];
+                        int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
 
-                for(int a=BATCH_SIZE; a<= 30; a = a+diff) {
-                    // 0xff000000 | (R << 16) | (G << 8) | B;
-                    float[][][][] result = new float[BATCH_SIZE][INPUT_SIZE][INPUT_SIZE][PIXEL_SIZE];
-                    int[] intValues = new int[INPUT_SIZE*INPUT_SIZE];
+                        double t1 = System.currentTimeMillis();
+                        tflite.run(imgData, result);
+                        double t2 = System.currentTimeMillis();
+                        difference += (t2 - t1) / 1000;
 
-                    double t1 = System.currentTimeMillis();
-                    tflite.run(imgData, result);
-                    double t2 = System.currentTimeMillis();
-                    double difference = (t2 - t1)/1000;
+                        if(itr == 99) {
 
-                    int idx = 0;
-                    for(int k =0; k<1; ++k) {
-                        for (int i = 0; i < INPUT_SIZE; ++i) {
-                            for (int j = 0; j < INPUT_SIZE; ++j) {
-                                int R = (int)result[k][i][j][0];
-                                int G = (int)result[k][i][j][1];
-                                int B = (int)result[k][i][j][2];
-                                intValues[idx] = 0xff000000 | (R) | (G) | B;
-                                idx++;
+                            int idx = 0;
+                            for (int k = 0; k < 1; ++k) {
+                                for (int i = 0; i < INPUT_SIZE; ++i) {
+                                    for (int j = 0; j < INPUT_SIZE; ++j) {
+                                        int R = (int) result[k][i][j][0];
+                                        int G = (int) result[k][i][j][1];
+                                        int B = (int) result[k][i][j][2];
+                                        intValues[idx] = 0xff000000 | (R) | (G) | B;
+                                        idx++;
+                                    }
+                                }
                             }
+                            bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
                         }
+
+                        if (a + diff > 30) {
+                            diff = a + diff - 30;
+                            if(diff != BATCH_SIZE)
+                                imgData = convertBitmapToByteBuffer(bitmap, diff);
+                        }
+                        //
                     }
-
-                    bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
-
-                    if(a+diff > 30){
-                        diff = a+diff - 30;
-                    }
-
-
+                    Log.i("ITR ", "" + itr + ": " + difference);
                     total += difference;
                 }
                 // Clean up
-                delegate.close();
-                Log.i("Time: ", " in secs: " + total);
-                System.out.println("Batch Size: " + BATCH_SIZE + "  Secs: " + total);
+//                delegate.close();
+                Log.i("Total Time ", " " + total);
+                total = total/100;
+                Log.i("AVG Time ", " " + total);
             } catch(Exception ex){
                 Log.w("WARNING: ", ex);
             }
@@ -182,13 +170,13 @@ public class MainActivity extends AppCompatActivity {
                 imageView.setImageBitmap(result);
         }
 
-        private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
+        private ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap, int BS) {
 //            ByteBuffer[] byteBuffer = new ByteBuffer[BATCH_SIZE];
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * PIXEL_SIZE);
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*BS * INPUT_SIZE * INPUT_SIZE * PIXEL_SIZE);
             int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
             bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
             int pixel = 0;
-            for(int k =0; k<BATCH_SIZE; ++k) {
+            for(int k =0; k<BS; ++k) {
 
 //                byteBuffer[k] = ByteBuffer.allocateDirect(4*BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * PIXEL_SIZE);
 //                byteBuffer[k].order(ByteOrder.nativeOrder());
@@ -225,8 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
         /** Memory-map the model file in Assets. */
         private MappedByteBuffer loadModelFile() throws IOException {
-            String Model = "m_without_lru.tflite";
-            AssetFileDescriptor fileDescriptor = getAssets().openFd(Model);
+            AssetFileDescriptor fileDescriptor = getAssets().openFd(MODEL_FILE);
             FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
             FileChannel fileChannel = inputStream.getChannel();
             long startOffset = fileDescriptor.getStartOffset();
