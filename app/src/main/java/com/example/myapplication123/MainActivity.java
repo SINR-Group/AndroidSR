@@ -89,47 +89,43 @@ public class MainActivity extends AppCompatActivity {
             String OUTPUT = "batch_normalization_17/FusedBatchNorm_1";
             String[] OUTPUT_NAMES = {OUTPUT};
             int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
-
-            int IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
+            int NEXT_IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
             bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-            int BS = 4;
 
-            Log.i("BS: ", " : " + BS);
+            int BATCH_SIZE = 1;
             double total = 0.0;
-            for(int itr=0; itr<10; ++itr) {
-                Log.i("ITR: ", " : " + itr);
-                double stotal = 0.0;
-                int BATCH_SIZE = BS;
-                int diff = BATCH_SIZE;
+            double stotal;
+            int diff = BATCH_SIZE;
+            float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
 
-                for (int a = BATCH_SIZE; a <= 30; a = a + diff) {
-                    float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
+            for (int k = 0; k < BATCH_SIZE; ++k) {
+                int N = NEXT_IMAGE_START * k;
+                for (int j = 0; j < intValues.length; ++j) {
+                    final int val = intValues[j];
 
-                    for (int k = 0; k < BATCH_SIZE; ++k) {
-                        int N = IMAGE_START * k;
-                        for (int j = 0; j < intValues.length; ++j) {
-                            final int val = intValues[j];
+                    floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
+                    floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
+                    floatValues[N + j * 3 + 2] = (val & 0xFF);
 
-                            floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
-                            floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
-                            floatValues[N + j * 3 + 2] = (val & 0xFF);
+                    floatValues[N + j * 3 + 2] = Color.red(val);
+                    floatValues[N + j * 3 + 1] = Color.green(val);
+                    floatValues[N + j * 3] = Color.blue(val);
 
-                            floatValues[N + j * 3 + 2] = Color.red(val);
-                            floatValues[N + j * 3 + 1] = Color.green(val);
-                            floatValues[N + j * 3] = Color.blue(val);
+                }
+            }
+            Log.i("Batch Size ", " : " + BATCH_SIZE);
 
-                        }
-                    }
-
+            for(int itr=0; itr<100; ++itr) {
+                stotal = 0.0;
+                for (int a = diff; a <= 30; a = a + diff) {
                     double t1 = System.currentTimeMillis();
-                    inferenceInterface.feed(INPUT_NAME, floatValues, BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, 3);
+                    inferenceInterface.feed(INPUT_NAME, floatValues, diff, INPUT_SIZE, INPUT_SIZE, 3);
                     inferenceInterface.run(OUTPUT_NAMES, false);
-                    float[] outputs = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
+                    float[] outputs = new float[diff * INPUT_SIZE * INPUT_SIZE * 3];
                     inferenceInterface.fetch(OUTPUT, outputs);
                     double t2 = System.currentTimeMillis();
-                    double difference = (t2 - t1) / 1000;
-                    stotal += difference;
-                    if(BS == 6 && itr == 9) {
+                    stotal = (t2 - t1) / 1000.0;
+                    if(itr == 99) {
                         int N = 0;
                         for (int i = 0; i < intValues.length; ++i) {
                             intValues[i] =
@@ -140,16 +136,43 @@ public class MainActivity extends AppCompatActivity {
                         }
                         bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
                     }
+
+                    //
                     if (a + diff > 30) {
                         diff = a + diff - 30;
+                        //
+                        if(diff != BATCH_SIZE) {
+                            floatValues = new float[diff * INPUT_SIZE * INPUT_SIZE * 3];
+
+                            for (int k = 0; k < diff; ++k) {
+                                int N = NEXT_IMAGE_START * k;
+                                for (int j = 0; j < intValues.length; ++j) {
+                                    final int val = intValues[j];
+
+                                    floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
+                                    floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
+                                    floatValues[N + j * 3 + 2] = (val & 0xFF);
+
+                                    floatValues[N + j * 3 + 2] = Color.red(val);
+                                    floatValues[N + j * 3 + 1] = Color.green(val);
+                                    floatValues[N + j * 3] = Color.blue(val);
+
+                                }
+                            }
+                        }
+                        //
+
                     }
+                    //
+
+
                 }
                 total += stotal;
-                Log.i("Time: ", " in secs: " + stotal);
-                Log.i("Total Time: ", " in secs: " + total);
+                Log.i("ITR ", "" + itr + " : " + stotal);
             }
-            total = total/10;
-            Log.i("Avg Time: ", " in secs: " + total);
+            Log.i("Total Time", " in secs: " + total);
+            total = total/100;
+            Log.i("Avg Time", " in secs: " + total);
             return bitmap;
         }
 
