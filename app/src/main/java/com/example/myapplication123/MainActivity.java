@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 //import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.experimental.GpuDelegate;
 //import org.tensorflow.lite.experimental.GpuDelegate;
 
 import java.io.File;
@@ -70,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
     private int BATCH_SIZE = 1;
     private static final int PIXEL_SIZE = 3;
 
-    static {
-        System.loadLibrary("tensorflow_inference");
-    }
+//    static {
+//        System.loadLibrary("tensorflow_inference");
+//    }
 
     private static final String MODEL_FILE = "file:///android_asset/m.tflite";
 
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public Bitmap predict(Bitmap bitmap, String modelName, AssetManager assets) {
-            double t1 = System.currentTimeMillis();
+
             final ActivityManager activityManager =
                     (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             final ConfigurationInfo configurationInfo =
@@ -116,24 +117,32 @@ public class MainActivity extends AppCompatActivity {
             System.err.println(configurationInfo.reqGlEsVersion >= 0x30000);
             System.err.println(String.format("%X", configurationInfo.reqGlEsVersion));
 
+            // NEW: Prepare GPU delegate.
+            GpuDelegate delegate = new GpuDelegate();
+            Interpreter.Options options = (new Interpreter.Options()).addDelegate(delegate);
+
+            /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
+            ByteBuffer imgData = convertBitmapToByteBuffer(bitmap);
+
+            double total = 0.0;
             try {
-                // NEW: Prepare GPU delegate.
-//                GpuDelegate delegate = new GpuDelegate();
-//                Interpreter.Options options = (new Interpreter.Options()).addDelegate(delegate);
-                Interpreter tflite = new Interpreter(loadModelFile());
+                Interpreter tflite = new Interpreter(loadModelFile(), options);
                 int[] dims = new int[] {BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, PIXEL_SIZE};
-                tflite.resizeInput(0, dims);
+//                tflite.resizeInput(0, dims);
+//                tflite.resizeInput(0, dims);
+
                 int diff = BATCH_SIZE;
+
                 for(int a=BATCH_SIZE; a<= 30; a = a+diff) {
-                    /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
-                    ByteBuffer imgData = convertBitmapToByteBuffer(bitmap);
                     // 0xff000000 | (R << 16) | (G << 8) | B;
                     float[][][][] result = new float[BATCH_SIZE][INPUT_SIZE][INPUT_SIZE][PIXEL_SIZE];
-    //                Map<Integer, Object> outputs = new HashMap<Integer, Object>();
-    //                outputs.put(0, result);
                     int[] intValues = new int[INPUT_SIZE*INPUT_SIZE];
-    //                Object[] inputs = new Object[]{imgData};
+
+                    double t1 = System.currentTimeMillis();
                     tflite.run(imgData, result);
+                    double t2 = System.currentTimeMillis();
+                    double difference = (t2 - t1)/1000;
+
                     int idx = 0;
                     for(int k =0; k<1; ++k) {
                         for (int i = 0; i < INPUT_SIZE; ++i) {
@@ -146,17 +155,20 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }
+
                     bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
+
                     if(a+diff > 30){
                         diff = a+diff - 30;
                     }
+
+
+                    total += difference;
                 }
                 // Clean up
-//                delegate.close();
-                double t2 = System.currentTimeMillis();
-                double difference = (t2 - t1)/1000;
-                Log.i("Time: ", " in secs: " + difference);
-                System.out.println("Batch Size: " + BATCH_SIZE + "  Secs: " + difference);
+                delegate.close();
+                Log.i("Time: ", " in secs: " + total);
+                System.out.println("Batch Size: " + BATCH_SIZE + "  Secs: " + total);
             } catch(Exception ex){
                 Log.w("WARNING: ", ex);
             }
@@ -213,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
         /** Memory-map the model file in Assets. */
         private MappedByteBuffer loadModelFile() throws IOException {
-            String Model = "m.tflite";
+            String Model = "m_without_lru.tflite";
             AssetFileDescriptor fileDescriptor = getAssets().openFd(Model);
             FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
             FileChannel fileChannel = inputStream.getChannel();
