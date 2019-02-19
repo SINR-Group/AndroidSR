@@ -1,19 +1,14 @@
 package com.example.myapplication123;
 
 import android.Manifest;
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.media.Image;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -27,13 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
-
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -117,14 +105,16 @@ public class MainActivity extends AppCompatActivity {
 
             for(int itr=0; itr<100; ++itr) {
                 stotal = 0.0;
+
                 for (int a = diff; a <= 30; a = a + diff) {
+
                     double t1 = System.currentTimeMillis();
                     inferenceInterface.feed(INPUT_NAME, floatValues, diff, INPUT_SIZE, INPUT_SIZE, 3);
                     inferenceInterface.run(OUTPUT_NAMES, false);
                     float[] outputs = new float[diff * INPUT_SIZE * INPUT_SIZE * 3];
                     inferenceInterface.fetch(OUTPUT, outputs);
                     double t2 = System.currentTimeMillis();
-                    stotal = (t2 - t1) / 1000.0;
+                    stotal += (t2 - t1) / 1000.0;
                     if(itr == 99) {
                         int N = 0;
                         for (int i = 0; i < intValues.length; ++i) {
@@ -136,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                         bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
                     }
-
                     //
                     if (a + diff > 30) {
                         diff = a + diff - 30;
@@ -161,11 +150,8 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                         //
-
                     }
                     //
-
-
                 }
                 total += stotal;
                 Log.i("ITR ", "" + itr + " : " + stotal);
