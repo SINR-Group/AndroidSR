@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.renderscript.ScriptGroup;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +22,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.qualcomm.qti.snpe.FloatTensor;
+import com.qualcomm.qti.snpe.NeuralNetwork;
+import com.qualcomm.qti.snpe.SNPE;
+
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static final String MODEL_FILE = "file:///android_asset/model_2.pb";
+//    private static final String DLC_MODEL_FILE = "file:///android_asset/model_2.dlc";
+    private static final String DLC_MODEL_NAME = "model_2.dlc";
+//    private static final String DLC_MODEL_NAME = "model_2_unconsumed.dlc";
 
 
 
@@ -71,94 +86,134 @@ public class MainActivity extends AppCompatActivity {
 
         public Bitmap predict(Bitmap bitmap, String modelName, AssetManager assets) {
             // Import the model
-            TensorFlowInferenceInterface inferenceInterface = new TensorFlowInferenceInterface(assets, modelName);
-            int INPUT_SIZE = 192;
-            String INPUT_NAME = "input_4";
-            String OUTPUT = "batch_normalization_17/FusedBatchNorm_1";
-            String[] OUTPUT_NAMES = {OUTPUT};
-            int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
-            int NEXT_IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
-            bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+            try {
+                InputStream model = getAssets().open(DLC_MODEL_NAME);
+                final SNPE.NeuralNetworkBuilder builder = new SNPE.NeuralNetworkBuilder(getApplication())
+                        .setRuntimeOrder(NeuralNetwork.Runtime.GPU, NeuralNetwork.Runtime.DSP, NeuralNetwork.Runtime.CPU)
+                        .setModel(model, model.available());
+                NeuralNetwork network = builder.build();
 
-            int BATCH_SIZE = 1;
-            double total = 0.0;
-            double stotal;
-            int diff = BATCH_SIZE;
-            float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
+//                TensorFlowInferenceInterface inferenceInterface = new TensorFlowInferenceInterface(assets, modelName);
+                int INPUT_SIZE = 192;
+                String INPUT_NAME = "input_4:0";
+                String OUTPUT = "batch_normalization_17/FusedBatchNorm_1:0";
+    //            String[] OUTPUT_NAMES = {OUTPUT};
+                int[] intValues = new int[INPUT_SIZE * INPUT_SIZE];
+                int NEXT_IMAGE_START = INPUT_SIZE * INPUT_SIZE * 3;
+                bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
-            for (int k = 0; k < BATCH_SIZE; ++k) {
-                int N = NEXT_IMAGE_START * k;
-                for (int j = 0; j < intValues.length; ++j) {
-                    final int val = intValues[j];
+                int BATCH_SIZE = 1;
+                double total = 0.0;
+                double stotal;
+                float[] floatValues = new float[BATCH_SIZE * INPUT_SIZE * INPUT_SIZE * 3];
 
-                    floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
-                    floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
-                    floatValues[N + j * 3 + 2] = (val & 0xFF);
+                for (int k = 0; k < BATCH_SIZE; ++k) {
+                    int N = NEXT_IMAGE_START * k;
+                    for (int j = 0; j < intValues.length; ++j) {
+                        final int val = intValues[j];
 
-                    floatValues[N + j * 3 + 2] = Color.red(val);
-                    floatValues[N + j * 3 + 1] = Color.green(val);
-                    floatValues[N + j * 3] = Color.blue(val);
+                        floatValues[N + j * 3] = ((val >> 16) & 0xFF);
+                        floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
+                        floatValues[N + j * 3 + 2] = (val & 0xFF);
 
-                }
-            }
-            Log.i("Batch Size ", " : " + BATCH_SIZE);
+                        floatValues[N + j * 3 + 2] = Color.red(val);
+                        floatValues[N + j * 3 + 1] = Color.green(val);
+                        floatValues[N + j * 3] = Color.blue(val);
 
-            for(int itr=0; itr<100; ++itr) {
-                stotal = 0.0;
-
-                for (int a = diff; a <= 30; a = a + diff) {
-
-                    double t1 = System.currentTimeMillis();
-                    inferenceInterface.feed(INPUT_NAME, floatValues, diff, INPUT_SIZE, INPUT_SIZE, 3);
-                    inferenceInterface.run(OUTPUT_NAMES, false);
-                    float[] outputs = new float[diff * INPUT_SIZE * INPUT_SIZE * 3];
-                    inferenceInterface.fetch(OUTPUT, outputs);
-                    double t2 = System.currentTimeMillis();
-                    stotal += (t2 - t1) / 1000.0;
-                    if(itr == 99) {
-                        int N = 0;
-                        for (int i = 0; i < intValues.length; ++i) {
-                            intValues[i] =
-                                    0xFF000000
-                                            | (((int) (outputs[N + i * 3] * 255)) << 16)
-                                            | (((int) (outputs[N + i * 3 + 1] * 255)) << 8)
-                                            | ((int) (outputs[N + i * 3 + 2] * 255));
-                        }
-                        bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
                     }
-                    //
-                    if (a + diff > 30) {
-                        diff = a + diff - 30;
+                }
+
+                final FloatTensor input = network.createFloatTensor(BATCH_SIZE, INPUT_SIZE, INPUT_SIZE, 3);
+                // Fills the tensor fully
+
+                input.write(floatValues, 0, floatValues.length);
+
+                // Fills the input tensors map which will be passed to execute()
+                Map<String, FloatTensor> inputsMap = new HashMap<>();
+                Map<String, FloatTensor> outputsMap = new HashMap<>();
+
+                inputsMap.put(INPUT_NAME, input);
+
+                Log.i("Batch Size ", " : " + BATCH_SIZE);
+
+                for(int itr=0; itr<100; ++itr) {
+                    stotal = 0.0;
+                    int diff = BATCH_SIZE;
+                    for (int a = diff; a <= 30; a = a + diff) {
+
+                        double t1 = System.currentTimeMillis();
+                        float[] outputs = new float[diff * INPUT_SIZE * INPUT_SIZE * 3];
+                        outputsMap = network.execute(inputsMap);
+
+                        for (Map.Entry<String, FloatTensor> output : outputsMap.entrySet()) {
+                            final FloatTensor tensor = output.getValue();
+                            outputs= new float[tensor.getSize()];
+                            tensor.read(outputs, 0, outputs.length);
+                            // Process the output ...
+                        }
+                        double t2 = System.currentTimeMillis();
+                        stotal += (t2 - t1) / 1000.0;
+
+                        if(itr == 99) {
+                            int N = 0;
+                            for (int i = 0; i < intValues.length; ++i) {
+                                intValues[i] =
+                                        0xFF000000
+                                                | (((int) (outputs[N + i * 3] * 255)) << 16)
+                                                | (((int) (outputs[N + i * 3 + 1] * 255)) << 8)
+                                                | ((int) (outputs[N + i * 3 + 2] * 255));
+                            }
+                            bitmap.setPixels(intValues, 0, INPUT_SIZE, 0, 0, INPUT_SIZE, INPUT_SIZE);
+                        }
                         //
-                        if(diff != BATCH_SIZE) {
-                            floatValues = new float[diff * INPUT_SIZE * INPUT_SIZE * 3];
+                        if (a + diff > 30) {
+                            diff = a + diff - 30;
+                            //
+                            if(diff != BATCH_SIZE) {
+                                floatValues = new float[diff * INPUT_SIZE * INPUT_SIZE * 3];
 
-                            for (int k = 0; k < diff; ++k) {
-                                int N = NEXT_IMAGE_START * k;
-                                for (int j = 0; j < intValues.length; ++j) {
-                                    final int val = intValues[j];
+                                for (int k = 0; k < diff; ++k) {
+                                    int N = NEXT_IMAGE_START * k;
+                                    for (int j = 0; j < intValues.length; ++j) {
+                                        final int val = intValues[j];
 
-                                    floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
-                                    floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
-                                    floatValues[N + j * 3 + 2] = (val & 0xFF);
+                                        floatValues[N + j * 3 + 0] = ((val >> 16) & 0xFF);
+                                        floatValues[N + j * 3 + 1] = ((val >> 8) & 0xFF);
+                                        floatValues[N + j * 3 + 2] = (val & 0xFF);
 
-                                    floatValues[N + j * 3 + 2] = Color.red(val);
-                                    floatValues[N + j * 3 + 1] = Color.green(val);
-                                    floatValues[N + j * 3] = Color.blue(val);
+                                        floatValues[N + j * 3 + 2] = Color.red(val);
+                                        floatValues[N + j * 3 + 1] = Color.green(val);
+                                        floatValues[N + j * 3] = Color.blue(val);
 
+                                    }
                                 }
                             }
+                            //
                         }
                         //
                     }
-                    //
+                    total += stotal;
+                    Log.i("ITR ", "" + itr + " : " + stotal);
                 }
-                total += stotal;
-                Log.i("ITR ", "" + itr + " : " + stotal);
+                Log.i("Total Time", " in secs: " + total);
+                total = total/100;
+                Log.i("Avg Time", " in secs: " + total);
+                // Release input tensors
+                for (FloatTensor tensor: inputsMap.values()) {
+                    tensor.release();
+                }
+                // Release output tensors
+                for (FloatTensor tensor: outputsMap.values()) {
+                    tensor.release();
+                }
+                // Calling release() once the application no longer needs the network instance
+                // is highly recommended as it releases native resources. Alternatively the
+                // resources will be released when the instance is garbage collected.
+                network.release();
             }
-            Log.i("Total Time", " in secs: " + total);
-            total = total/100;
-            Log.i("Avg Time", " in secs: " + total);
+            catch(IOException ex){
+                System.out.println("IOexception at reading dlc model:::    " +  ex);
+            }
             return bitmap;
         }
 

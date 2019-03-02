@@ -18,30 +18,30 @@ nexus 5 api 23
 
 Batch Size = 1
 I/Time::  in secs: 16.066000000000003
-I/Total Time::  in secs: 150.74
-I/Avg Time::  in secs: 15.074000000000002
+I/Totalï¿½Time::  in secs: 150.74
+I/Avgï¿½Time::  in secs: 15.074000000000002
 
 Batch Size = 2
 I/Time::  in secs: 16.718
-I/Total Time::  in secs: 166.84999999999997
-I/Avg Time::  in secs: 16.684999999999995
+I/Totalï¿½Time::  in secs: 166.84999999999997
+I/Avgï¿½Time::  in secs: 16.684999999999995
 
 Batch Size = 3
 I/Time::  in secs: 16.068
-I/Total Time::  in secs: 160.707
-I/Avg Time::  in secs: 16.0707
+I/Totalï¿½Time::  in secs: 160.707
+I/Avgï¿½Time::  in secs: 16.0707
 
 Batch Size = 4
 I/Time::  in secs: 16.98
-I/Total Time::  in secs: 170.109
-I/Avg Time::  in secs: 17.0109
+I/Totalï¿½Time::  in secs: 170.109
+I/Avgï¿½Time::  in secs: 17.0109
 
 
 //single run
 Batch Size = 5
 I/Time::  in secs: 15.896
-I/Total Time::  in secs: 138.359
-I/Avg Time::  in secs: 13.8359
+I/Totalï¿½Time::  in secs: 138.359
+I/Avgï¿½Time::  in secs: 13.8359
 
 Batch Size = 6
 
@@ -50,28 +50,684 @@ nexus 4 api 22
 
 Batch Size = 1
 I/Time::  in secs: 21.339
-I/Total Time::  in secs: 217.13799999999998
-I/Avg Time::  in secs: 21.7138
+I/Totalï¿½Time::  in secs: 217.13799999999998
+I/Avgï¿½Time::  in secs: 21.7138
 
 Batch Size = 2
 I/Time::  in secs: 23.987999999999996
-I/Total Time::  in secs: 228.986
-I/Avg Time::  in secs: 22.8986
+I/Totalï¿½Time::  in secs: 228.986
+I/Avgï¿½Time::  in secs: 22.8986
 
 
 Batch Size = 3
 I/Time::  in secs: 23.794
-I/Total Time::  in secs: 227.28600000000003
-I/Avg Time::  in secs: 22.728600000000004
+I/Totalï¿½Time::  in secs: 227.28600000000003
+I/Avgï¿½Time::  in secs: 22.728600000000004
 
 Batch Size = 4
 I/Time::  in secs: 24.947
-I/Total Time::  in secs: 245.29400000000004
-I/Avg Time::  in secs: 24.529400000000003
+I/Totalï¿½Time::  in secs: 245.29400000000004
+I/Avgï¿½Time::  in secs: 24.529400000000003
 
 Batch Size = 5
 I/Time::  in secs: 24.377
-I/Total Time::  in secs: 241.88799999999998
-I/Avg Time::  in secs: 24.188799999999997
+I/Totalï¿½Time::  in secs: 241.88799999999998
+I/Avgï¿½Time::  in secs: 24.188799999999997
 
 Batch Size = 6
+
+
+
+
+
+--------------------------------------------------------------------------
+
+
+Google Pixel 2
+on Snap Dragon SDK Library 
+.setRuntimeOrder(NeuralNetwork.Runtime.GPU, NeuralNetwork.Runtime.DSP, NeuralNetwork.Runtime.CPU)
+
+
+
+I/System.out: [input_4:0]
+    [batch_normalization_17/FusedBatchNorm_1:0]
+I/BatchÂ Size:  : 1
+W/com.example.myapplication123: type=1400 audit(0.0:99): avc: denied { search } for comm=4173796E635461736B202331 name="soc0" dev="sysfs" ino=49067 scontext=u:r:untrusted_app:s0:c153,c256,c512,c768 tcontext=u:object_r:sysfs_soc:s0 tclass=dir permissive=0
+I/ITR: 0 : 10.925000000000002
+I/ITR: 1 : 10.584
+I/ITR: 2 : 10.951000000000002
+I/ITR: 3 : 11.278999999999998
+I/ITR: 4 : 10.803
+I/ITR: 5 : 10.75
+I/ITR: 6 : 12.149000000000001
+I/ITR: 7 : 11.418999999999997
+I/ITR: 8 : 11.317000000000002
+I/ITR: 9 : 11.158000000000001
+I/ITR: 10 : 11.277
+I/ITR: 11 : 11.621999999999998
+I/ITR: 12 : 12.436
+I/ITR: 13 : 11.197000000000003
+I/ITR: 14 : 11.668999999999999
+I/ITR: 15 : 11.815999999999999
+I/ITR: 16 : 11.515
+I/ITR: 17 : 11.553000000000003
+I/ITR: 18 : 10.891999999999998
+I/ITR: 19 : 11.196
+I/ITR: 20 : 10.735000000000001
+I/yapplication12: Waiting for a blocking GC ProfileSaver
+I/ITR: 21 : 10.936
+I/ITR: 22 : 11.719
+I/ITR: 23 : 11.244
+I/ITR: 24 : 11.357
+I/yapplication12: Waiting for a blocking GC ProfileSaver
+I/yapplication12: WaitForGcToComplete blocked ProfileSaver on HeapTrim for 13.397ms
+I/ITR: 25 : 12.74
+I/ITR: 26 : 11.960999999999999
+I/ITR: 27 : 11.276
+I/ITR: 28 : 11.099000000000002
+I/ITR: 29 : 11.863999999999999
+I/ITR: 30 : 12.143000000000002
+I/ITR: 31 : 11.641000000000002
+I/yapplication12: Waiting for a blocking GC ProfileSaver
+I/yapplication12: WaitForGcToComplete blocked ProfileSaver on HeapTrim for 13.529ms
+I/ITR: 32 : 11.475999999999997
+I/ITR: 33 : 11.291999999999996
+I/ITR: 34 : 11.634
+I/ITR: 35 : 10.894999999999996
+I/yapplication12: Waiting for a blocking GC ProfileSaver
+I/yapplication12: WaitForGcToComplete blocked ProfileSaver on HeapTrim for 11.095ms
+I/ITR: 36 : 11.557
+I/ITR: 37 : 11.067
+I/ITR: 38 : 11.586
+I/ITR: 39 : 11.151
+I/ITR: 40 : 12.443000000000003
+I/ITR: 41 : 12.000999999999998
+I/ITR: 42 : 11.84
+I/ITR: 43 : 11.590999999999998
+I/ITR: 44 : 11.168000000000003
+I/ITR: 45 : 11.369999999999997
+I/ITR: 46 : 11.780000000000003
+I/ITR: 47 : 11.703
+I/ITR: 48 : 11.785
+I/ITR: 49 : 11.333000000000004
+I/ITR: 50 : 12.393
+I/ITR: 51 : 12.029000000000002
+I/ITR: 52 : 11.752
+I/ITR: 53 : 11.83
+I/ITR: 54 : 11.078000000000001
+I/ITR: 55 : 11.620000000000003
+I/ITR: 56 : 12.299
+I/ITR: 57 : 11.403000000000002
+I/ITR: 58 : 11.174
+I/ITR: 59 : 11.205
+I/ITR: 60 : 11.255
+I/ITR: 61 : 11.613000000000001
+I/ITR: 62 : 10.797
+I/ITR: 63 : 11.880000000000003
+I/ITR: 64 : 11.537999999999998
+I/ITR: 65 : 11.469000000000001
+I/ITR: 66 : 11.081
+I/ITR: 67 : 11.285000000000002
+I/ITR: 68 : 10.879000000000001
+I/ITR: 69 : 10.987999999999998
+I/ITR: 70 : 11.529999999999998
+I/ITR: 71 : 11.247000000000002
+I/ITR: 72 : 10.947
+I/ITR: 73 : 11.251
+I/ITR: 74 : 11.909999999999998
+I/ITR: 75 : 10.818
+I/ITR: 76 : 11.782
+I/ITR: 77 : 11.453000000000001
+I/ITR: 78 : 11.581
+I/ITR: 79 : 10.606000000000002
+I/ITR: 80 : 11.649
+I/ITR: 81 : 11.053
+I/ITR: 82 : 12.575999999999997
+I/ITR: 83 : 11.922000000000002
+I/ITR: 84 : 10.825000000000001
+I/ITR: 85 : 10.978000000000002
+I/ITR: 86 : 11.696000000000002
+I/ITR: 87 : 11.989
+I/ITR: 88 : 11.943
+I/ITR: 89 : 11.508
+I/ITR: 90 : 12.412999999999997
+I/ITR: 91 : 11.54
+I/ITR: 92 : 11.290000000000001
+I/ITR: 93 : 12.181999999999997
+I/ITR: 94 : 11.643999999999997
+I/ITR: 95 : 12.17
+I/ITR: 96 : 11.700999999999999
+I/ITR: 97 : 10.918000000000001
+I/ITR: 98 : 11.355000000000002
+I/ITR: 99 : 11.121
+I/TotalÂ Time:  in secs: 1148.061
+I/AvgÂ Time:  in secs: 11.480609999999999
+
+
+
+
+
+--------------------------------------------------------------
+I/BatchÂ Size:  : 2
+W/com.example.myapplication123: type=1400 audit(0.0:974): avc: denied { search } for comm=4173796E635461736B202331 name="soc0" dev="sysfs" ino=49067 scontext=u:r:untrusted_app:s0:c153,c256,c512,c768 tcontext=u:object_r:sysfs_soc:s0 tclass=dir permissive=0
+I/ITR: 0 : 10.344999999999999
+I/ITR: 1 : 10.257000000000001
+I/ITR: 2 : 10.153999999999996
+I/ITR: 3 : 10.598
+I/ITR: 4 : 10.317000000000002
+I/ITR: 5 : 10.332
+I/ITR: 6 : 10.389000000000001
+I/ITR: 7 : 10.652
+I/ITR: 8 : 10.725
+I/ITR: 9 : 10.507
+I/ITR: 10 : 10.352
+I/ITR: 11 : 10.536
+I/ITR: 12 : 10.604000000000001
+I/ITR: 13 : 10.321
+I/ITR: 14 : 10.463
+I/ITR: 15 : 10.660999999999998
+
+
+
+--------------------------------------------------------------------
+I/BatchÂ Size:  : 3
+W/com.example.myapplication123: type=1400 audit(0.0:980): avc: denied { search } for comm=4173796E635461736B202331 name="soc0" dev="sysfs" ino=49067 scontext=u:r:untrusted_app:s0:c153,c256,c512,c768 tcontext=u:object_r:sysfs_soc:s0 tclass=dir permissive=0
+I/ITR: 0 : 10.046000000000001
+I/ITR: 1 : 10.125
+I/ITR: 2 : 10.258999999999999
+I/ITR: 3 : 10.377999999999998
+I/ITR: 4 : 10.427
+I/yapplication12: Waiting for a blocking GC ProfileSaver
+I/yapplication12: WaitForGcToComplete blocked ProfileSaver on HeapTrim for 8.226ms
+I/ITR: 5 : 10.23
+I/ITR: 6 : 10.258
+I/ITR: 7 : 10.539
+I/ITR: 8 : 9.881999999999998
+I/ITR: 9 : 10.004
+I/ITR: 10 : 10.546999999999999
+I/ITR: 11 : 10.327000000000002
+I/ITR: 12 : 10.439
+I/ITR: 13 : 10.202
+
+----------------------------------------------------------------------------------------------------------------------------------------
+I/BatchÂ Size:  : 5
+W/com.example.myapplication123: type=1400 audit(0.0:986): avc: denied { search } for comm=4173796E635461736B202331 name="soc0" dev="sysfs" ino=49067 scontext=u:r:untrusted_app:s0:c153,c256,c512,c768 tcontext=u:object_r:sysfs_soc:s0 tclass=dir permissive=0
+I/ITR: 0 : 9.919
+I/ITR: 1 : 10.030000000000001
+I/ITR: 2 : 10.394
+I/ITR: 3 : 10.049
+I/ITR: 4 : 10.097999999999999
+I/ITR: 5 : 10.105
+I/ITR: 6 : 10.283999999999999
+I/ITR: 7 : 9.822
+I/ITR: 8 : 10.049
+I/ITR: 9 : 10.304
+I/ITR: 10 : 10.277
+I/ITR: 11 : 10.018
+I/ITR: 12 : 10.24
+I/ITR: 13 : 9.835
+I/ITR: 14 : 9.855
+I/ITR: 15 : 10.392
+I/ITR: 16 : 9.823
+I/ITR: 17 : 9.932999999999998
+I/ITR: 18 : 9.985
+I/ITR: 19 : 10.393999999999998
+I/ITR: 20 : 9.911000000000001
+I/ITR: 21 : 9.807
+I/ITR: 22 : 9.883
+I/ITR: 23 : 10.614
+I/ITR: 24 : 10.062
+I/ITR: 25 : 10.26
+I/ITR: 26 : 10.321000000000002
+I/ITR: 27 : 9.688
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+W/com.example.myapplication123: type=1400 audit(0.0:991): avc: denied { search } for comm=4173796E635461736B202331 name="soc0" dev="sysfs" ino=49067 scontext=u:r:untrusted_app:s0:c153,c256,c512,c768 tcontext=u:object_r:sysfs_soc:s0 tclass=dir permissive=0
+I/BatchÂ Size:  : 10
+W/com.example.myapplication123: type=1400 audit(0.0:992): avc: denied { search } for comm=4173796E635461736B202331 name="soc0" dev="sysfs" ino=49067 scontext=u:r:untrusted_app:s0:c153,c256,c512,c768 tcontext=u:object_r:sysfs_soc:s0 tclass=dir permissive=0
+I/ITR: 0 : 9.773
+I/ITR: 1 : 10.064
+I/ITR: 2 : 10.074
+I/ITR: 3 : 9.828
+I/ITR: 4 : 10.120000000000001
+I/ITR: 5 : 9.774
+I/ITR: 6 : 9.915
+I/ITR: 7 : 9.81
+I/ITR: 8 : 10.001
+I/ITR: 9 : 9.876999999999999
+I/ITR: 10 : 9.701
+I/ITR: 11 : 9.989
+I/ITR: 12 : 9.943999999999999
+I/ITR: 13 : 10.054
+I/ITR: 14 : 9.933
+I/ITR: 15 : 9.923
+I/ITR: 16 : 10.268
+I/ITR: 17 : 10.057
+I/ITR: 18 : 9.936
+I/ITR: 19 : 9.969
+I/ITR: 20 : 9.929
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+OnePLus OnePLus
+
+I/SYMPHONY: [36mA t7418fff4f0 /home/host/build/aarch64-android-clang6.0/SecondParty/symphony/src/symphony/src/lib/internal/soc/topology.c:414 [WARNING] Unable to determine the GPU topology. All power control for GPU will be silently ignored.[0m
+I/BatchÂ Size:  : 1
+I/ITR: 0 : 3.0040000000000013
+I/ITR: 1 : 2.999
+I/ITR: 2 : 3.0010000000000012
+I/ITR: 3 : 2.999000000000001
+I/ITR: 4 : 2.9990000000000014
+I/ITR: 5 : 3.001000000000001
+I/ITR: 6 : 2.999000000000001
+I/ITR: 7 : 2.999000000000001
+I/ITR: 8 : 2.999000000000001
+I/ITR: 9 : 2.9990000000000014
+I/ITR: 10 : 2.999000000000001
+I/ITR: 11 : 2.9990000000000014
+I/ITR: 12 : 2.9990000000000006
+I/ITR: 13 : 3.0000000000000013
+I/ITR: 14 : 2.999000000000001
+I/ITR: 15 : 3.0000000000000004
+I/ITR: 16 : 2.9980000000000016
+I/ITR: 17 : 2.9980000000000016
+I/ITR: 18 : 3.0010000000000012
+I/ITR: 19 : 2.7390000000000003
+I/ITR: 20 : 2.59
+I/ITR: 21 : 2.59
+I/ITR: 22 : 2.6140000000000008
+I/ITR: 23 : 2.614
+I/ITR: 24 : 2.6130000000000004
+I/ITR: 25 : 2.62
+I/ITR: 26 : 2.608
+I/ITR: 27 : 2.6070000000000007
+I/ITR: 28 : 2.602
+I/yapplication12: Waiting for a blocking GC ProfileSaver
+I/yapplication12: WaitForGcToComplete blocked ProfileSaver on HeapTrim for 11.101ms
+I/ITR: 29 : 2.617
+I/ITR: 30 : 2.6000000000000005
+I/ITR: 31 : 2.5950000000000006
+I/ITR: 32 : 2.6000000000000005
+I/ITR: 33 : 2.5999999999999996
+I/ITR: 34 : 2.5859999999999994
+I/ITR: 35 : 2.5970000000000004
+I/ITR: 36 : 2.5990000000000006
+I/ITR: 37 : 2.591
+I/ITR: 38 : 2.5940000000000003
+I/ITR: 39 : 2.593
+I/ITR: 40 : 2.593
+I/ITR: 41 : 2.588
+I/ITR: 42 : 2.592
+I/ITR: 43 : 2.5990000000000006
+I/ITR: 44 : 2.5900000000000003
+I/ITR: 45 : 2.5940000000000003
+I/ITR: 46 : 2.5850000000000004
+I/ITR: 47 : 2.5870000000000006
+I/ITR: 48 : 2.5820000000000003
+I/ITR: 49 : 2.5910000000000006
+I/ITR: 50 : 2.5930000000000004
+I/ITR: 51 : 2.586
+I/ITR: 52 : 2.5869999999999997
+I/ITR: 53 : 2.591
+I/ITR: 54 : 2.596
+I/ITR: 55 : 2.5919999999999996
+I/ITR: 56 : 2.597
+I/ITR: 57 : 2.592
+I/ITR: 58 : 2.5900000000000007
+I/ITR: 59 : 2.576
+I/ITR: 60 : 2.5490000000000004
+I/ITR: 61 : 2.5900000000000003
+I/ITR: 62 : 2.5580000000000003
+I/ITR: 63 : 2.587
+I/ITR: 64 : 2.5869999999999997
+I/ITR: 65 : 2.5870000000000006
+I/ITR: 66 : 2.5820000000000007
+I/ITR: 67 : 2.596000000000001
+I/ITR: 68 : 2.5850000000000004
+I/ITR: 69 : 2.5940000000000003
+I/ITR: 70 : 2.5860000000000003
+I/ITR: 71 : 2.592000000000001
+I/ITR: 72 : 2.587
+I/ITR: 73 : 2.591
+I/ITR: 74 : 2.586
+I/ITR: 75 : 2.5800000000000005
+I/ITR: 76 : 2.5940000000000003
+I/ITR: 77 : 2.5820000000000003
+I/ITR: 78 : 2.5860000000000007
+I/ITR: 79 : 2.591
+I/ITR: 80 : 2.588000000000001
+I/ITR: 81 : 2.5790000000000006
+I/ITR: 82 : 2.5880000000000005
+I/ITR: 83 : 2.5809999999999995
+I/ITR: 84 : 2.588
+I/ITR: 85 : 2.6
+I/ITR: 86 : 2.5820000000000007
+I/ITR: 87 : 2.5829999999999993
+I/ITR: 88 : 2.582
+I/ITR: 89 : 2.593
+I/ITR: 90 : 2.579
+I/ITR: 91 : 2.588
+I/ITR: 92 : 2.5830000000000006
+I/ITR: 93 : 2.5800000000000005
+I/ITR: 94 : 2.585
+I/ITR: 95 : 2.5789999999999993
+I/ITR: 96 : 2.585
+I/ITR: 97 : 2.5750000000000006
+I/ITR: 98 : 2.5829999999999997
+I/ITR: 99 : 2.5960000000000014
+I/TotalÂ Time:  in secs: 266.949
+I/AvgÂ Time:  in secs: 2.66949
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+E/libc: Access denied finding property "vendor.debug.egl.swapinterval"
+I/BatchÂ Size:  : 2
+I/ITR: 0 : 1.792
+I/ITR: 1 : 1.573
+I/ITR: 2 : 1.7680000000000002
+I/ITR: 3 : 1.755
+I/ITR: 4 : 1.7430000000000003
+I/ITR: 5 : 1.6949999999999998
+I/ITR: 6 : 1.88
+I/ITR: 7 : 1.7980000000000003
+I/ITR: 8 : 1.7180000000000004
+I/ITR: 9 : 1.7990000000000002
+I/ITR: 10 : 1.661
+I/ITR: 11 : 1.8820000000000001
+I/ITR: 12 : 1.7520000000000002
+I/ITR: 13 : 1.8820000000000003
+I/ITR: 14 : 1.6380000000000003
+I/ITR: 15 : 1.7080000000000002
+I/ITR: 16 : 1.675
+I/ITR: 17 : 1.799
+I/ITR: 18 : 1.8450000000000002
+I/ITR: 19 : 1.735
+I/ITR: 20 : 1.8380000000000003
+I/ITR: 21 : 1.663
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+I/SYMPHONY: [36mA t7419bd34f0 /home/host/build/aarch64-android-clang6.0/SecondParty/symphony/src/symphony/src/lib/internal/soc/topology.c:414 [WARNING] Unable to determine the GPU topology. All power control for GPU will be silently ignored.[0m
+I/BatchÂ Size:  : 3
+I/ITR: 0 : 1.4170000000000003
+I/ITR: 1 : 1.3129999999999997
+I/ITR: 2 : 1.2999999999999998
+I/ITR: 3 : 1.367
+I/ITR: 4 : 1.4000000000000004
+I/ITR: 5 : 1.4000000000000001
+I/ITR: 6 : 1.3990000000000005
+I/ITR: 7 : 1.4000000000000004
+I/ITR: 8 : 1.4000000000000001
+I/ITR: 9 : 1.4000000000000004
+I/ITR: 10 : 1.3990000000000002
+I/ITR: 11 : 1.4010000000000002
+I/ITR: 12 : 1.4000000000000004
+I/ITR: 13 : 1.4000000000000004
+I/ITR: 14 : 1.4600000000000004
+I/ITR: 15 : 1.4000000000000004
+I/ITR: 16 : 1.4000000000000004
+I/ITR: 17 : 1.4000000000000004
+I/ITR: 18 : 1.4000000000000004
+I/ITR: 19 : 1.439
+I/ITR: 20 : 1.4010000000000002
+I/ITR: 21 : 1.4000000000000004
+I/ITR: 22 : 1.4000000000000004
+I/ITR: 23 : 1.4000000000000004
+I/ITR: 24 : 1.4200000000000004
+I/ITR: 25 : 1.3990000000000002
+I/ITR: 26 : 1.4000000000000001
+I/ITR: 27 : 1.4000000000000001
+I/ITR: 28 : 1.3940000000000001
+I/ITR: 29 : 1.3860000000000001
+I/ITR: 30 : 1.4000000000000004
+I/ITR: 31 : 1.4000000000000001
+I/ITR: 32 : 1.4000000000000001
+I/ITR: 33 : 1.4000000000000004
+I/ITR: 34 : 1.4000000000000004
+I/ITR: 35 : 1.4190000000000003
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+I/SYMPHONY: [36mA t74197ff4f0 /home/host/build/aarch64-android-clang6.0/SecondParty/symphony/src/symphony/src/lib/internal/soc/topology.c:414 [WARNING] Unable to determine the GPU topology. All power control for GPU will be silently ignored.[0m
+I/BatchÂ Size:  : 4
+I/ITR: 0 : 1.408
+I/ITR: 1 : 1.2770000000000001
+I/ITR: 2 : 1.278
+I/ITR: 3 : 1.2770000000000001
+I/ITR: 4 : 1.278
+I/ITR: 5 : 1.2770000000000001
+I/ITR: 6 : 1.278
+I/ITR: 7 : 1.276
+I/ITR: 8 : 1.278
+I/ITR: 9 : 1.276
+I/ITR: 10 : 1.278
+I/ITR: 11 : 1.2770000000000001
+I/ITR: 12 : 1.278
+I/ITR: 13 : 1.2770000000000001
+I/ITR: 14 : 1.278
+I/ITR: 15 : 1.2770000000000001
+I/ITR: 16 : 1.279
+I/ITR: 17 : 1.2770000000000001
+I/ITR: 18 : 1.2770000000000001
+I/ITR: 19 : 1.2770000000000001
+I/ITR: 20 : 1.278
+I/ITR: 21 : 1.276
+I/ITR: 22 : 1.278
+I/ITR: 23 : 1.2770000000000001
+I/ITR: 24 : 1.278
+I/ITR: 25 : 1.2770000000000001
+I/ITR: 26 : 1.278
+I/ITR: 27 : 1.276
+I/ITR: 28 : 1.278
+I/ITR: 29 : 1.277
+I/ITR: 30 : 1.2770000000000001
+I/ITR: 31 : 1.2770000000000001
+I/ITR: 32 : 1.278
+I/ITR: 33 : 1.276
+I/ITR: 34 : 1.278
+I/ITR: 35 : 1.276
+I/ITR: 36 : 1.278
+I/ITR: 37 : 1.276
+I/ITR: 38 : 1.278
+I/ITR: 39 : 1.276
+I/ITR: 40 : 1.2770000000000001
+I/ITR: 41 : 1.279
+I/ITR: 42 : 1.278
+I/ITR: 43 : 1.2770000000000001
+I/ITR: 44 : 1.279
+I/ITR: 45 : 1.316
+I/ITR: 46 : 1.278
+I/ITR: 47 : 1.276
+I/ITR: 48 : 1.2770000000000001
+I/ITR: 49 : 1.278
+I/ITR: 50 : 1.278
+I/ITR: 51 : 1.277
+I/ITR: 52 : 1.2770000000000001
+I/ITR: 53 : 1.2770000000000001
+I/ITR: 54 : 1.2770000000000001
+I/ITR: 55 : 1.2770000000000001
+I/ITR: 56 : 1.2770000000000001
+I/ITR: 57 : 1.2770000000000001
+I/ITR: 58 : 1.278
+I/ITR: 59 : 1.276
+I/ITR: 60 : 1.2770000000000001
+I/ITR: 61 : 1.278
+I/ITR: 62 : 1.2770000000000001
+I/ITR: 63 : 1.2770000000000001
+I/ITR: 64 : 1.2770000000000001
+I/ITR: 65 : 1.2770000000000001
+I/ITR: 66 : 1.2770000000000001
+I/ITR: 67 : 1.2770000000000001
+I/ITR: 68 : 1.278
+I/ITR: 69 : 1.2770000000000001
+I/ITR: 70 : 1.2770000000000001
+I/ITR: 71 : 1.278
+I/ITR: 72 : 1.2770000000000001
+I/ITR: 73 : 1.278
+I/ITR: 74 : 1.2770000000000001
+I/ITR: 75 : 1.2770000000000001
+I/ITR: 76 : 1.2770000000000001
+I/ITR: 77 : 1.277
+I/ITR: 78 : 1.2770000000000001
+I/ITR: 79 : 1.2770000000000001
+I/ITR: 80 : 1.2770000000000001
+I/ITR: 81 : 1.2770000000000001
+I/ITR: 82 : 1.2770000000000001
+I/ITR: 83 : 1.278
+I/ITR: 84 : 1.2770000000000001
+I/ITR: 85 : 1.278
+I/ITR: 86 : 1.2770000000000001
+I/ITR: 87 : 1.276
+I/ITR: 88 : 1.2770000000000001
+I/ITR: 89 : 1.278
+I/ITR: 90 : 1.2770000000000001
+I/ITR: 91 : 1.2770000000000001
+I/ITR: 92 : 1.2770000000000001
+I/ITR: 93 : 1.2770000000000001
+I/ITR: 94 : 1.278
+I/ITR: 95 : 1.2770000000000001
+I/ITR: 96 : 1.2770000000000001
+I/ITR: 97 : 1.278
+I/ITR: 98 : 1.2770000000000001
+I/ITR: 99 : 1.276
+I/TotalÂ Time:  in secs: 127.89400000000012
+I/AvgÂ Time:  in secs: 1.2789400000000013
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+W/RenderThread: type=1400 audit(0.0:3271): avc: denied { read } for name="u:object_r:vendor_default_prop:s0" dev="tmpfs" ino=18604 scontext=u:r:untrusted_app:s0:c119,c256,c512,c768 tcontext=u:object_r:vendor_default_prop:s0 tclass=file permissive=0
+I/SYMPHONY: [36mA t74197ff4f0 /home/host/build/aarch64-android-clang6.0/SecondParty/symphony/src/symphony/src/lib/internal/soc/topology.c:414 [WARNING] Unable to determine the GPU topology. All power control for GPU will be silently ignored.[0m
+I/BatchÂ Size:  : 5
+I/ITR: 0 : 2.087
+I/ITR: 1 : 2.015
+I/ITR: 2 : 2.021
+I/ITR: 3 : 2.04
+I/ITR: 4 : 2.039
+I/ITR: 5 : 2.036
+I/ITR: 6 : 2.003
+I/ITR: 7 : 2.0380000000000003
+I/ITR: 8 : 2.041
+I/ITR: 9 : 2.017
+I/ITR: 10 : 2.052
+I/ITR: 11 : 2.047
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+I/BatchÂ Size:  : 10
+I/ITR: 0 : 1.888
+I/ITR: 1 : 1.834
+I/ITR: 2 : 1.8330000000000002
+I/ITR: 3 : 1.84
+I/ITR: 4 : 1.8219999999999998
+I/ITR: 5 : 1.851
+I/ITR: 6 : 1.828
+I/ITR: 7 : 1.85
+I/ITR: 8 : 1.864
+I/ITR: 9 : 1.85
+I/ITR: 10 : 1.8319999999999999
+I/ITR: 11 : 1.851
+I/ITR: 12 : 1.83
+I/ITR: 13 : 1.869
+I/ITR: 14 : 1.8249999999999997
+I/ITR: 15 : 1.8319999999999999
+I/ITR: 16 : 1.838
+I/ITR: 17 : 1.8449999999999998
+I/ITR: 18 : 1.842
+I/ITR: 19 : 1.835
+I/ITR: 20 : 1.822
+I/yapplication12: Background concurrent copying GC freed 89(32KB) AllocSpace objects, 8(33MB) LOS objects, 43% free, 31MB/55MB, paused 5.742ms total 32.494ms
+I/ITR: 21 : 1.858
+I/yapplication12: Background concurrent copying GC freed 89(32KB) AllocSpace objects, 8(33MB) LOS objects, 43% free, 31MB/55MB, paused 5.040ms total 31.994ms
+I/ITR: 22 : 1.823
+I/ITR: 23 : 1.859
+I/ITR: 24 : 1.859
+I/ITR: 25 : 1.8539999999999999
+I/ITR: 26 : 1.822
+I/ITR: 27 : 1.83
+I/ITR: 28 : 1.84
+I/ITR: 29 : 1.839
+I/ITR: 30 : 1.8450000000000002
+I/ITR: 31 : 1.7189999999999999
+I/ITR: 32 : 1.842
+I/ITR: 33 : 1.8499999999999999
+I/ITR: 34 : 1.823
+I/ITR: 35 : 1.835
+I/ITR: 36 : 1.814
+I/ITR: 37 : 1.8290000000000002
+I/ITR: 38 : 1.837
+I/ITR: 39 : 1.84
+I/ITR: 40 : 1.8239999999999998
+I/ITR: 41 : 1.835
+I/ITR: 42 : 1.785
+I/ITR: 43 : 1.8330000000000002
+I/ITR: 44 : 1.8219999999999998
+I/ITR: 45 : 1.83
+I/ITR: 46 : 1.846
+I/ITR: 47 : 1.858
+I/ITR: 48 : 1.843
+I/ITR: 49 : 1.831
+I/ITR: 50 : 1.803
+I/ITR: 51 : 1.839
+I/ITR: 52 : 1.831
+I/ITR: 53 : 1.8319999999999999
+I/ITR: 54 : 1.8559999999999999
+I/ITR: 55 : 1.819
+I/ITR: 56 : 1.802
+I/ITR: 57 : 1.8139999999999998
+I/ITR: 58 : 1.8129999999999997
+I/ITR: 59 : 1.8059999999999998
+I/ITR: 60 : 1.798
+I/ITR: 61 : 1.804
+I/ITR: 62 : 1.802
+I/ITR: 63 : 1.7959999999999998
+I/ITR: 64 : 1.8009999999999997
+I/ITR: 65 : 1.7939999999999998
+I/ITR: 66 : 1.805
+I/ITR: 67 : 1.799
+I/ITR: 68 : 1.8009999999999997
+I/ITR: 69 : 1.798
+I/ITR: 70 : 1.802
+I/ITR: 71 : 1.797
+I/ITR: 72 : 1.8009999999999997
+I/ITR: 73 : 1.7979999999999998
+I/ITR: 74 : 1.803
+I/ITR: 75 : 1.795
+I/ITR: 76 : 1.803
+I/ITR: 77 : 1.795
+I/ITR: 78 : 1.802
+I/ITR: 79 : 1.819
+I/ITR: 80 : 1.811
+I/ITR: 81 : 1.81
+I/ITR: 82 : 1.8039999999999998
+I/ITR: 83 : 1.8089999999999997
+I/ITR: 84 : 1.8079999999999998
+I/ITR: 85 : 1.8139999999999998
+I/ITR: 86 : 1.8209999999999997
+I/ITR: 87 : 1.799
+I/ITR: 88 : 1.81
+I/ITR: 89 : 1.831
+I/ITR: 90 : 1.838
+I/ITR: 91 : 1.7999999999999998
+I/ITR: 92 : 1.803
+I/ITR: 93 : 1.796
+I/ITR: 94 : 1.805
+I/ITR: 95 : 1.795
+I/ITR: 96 : 1.8199999999999998
+I/ITR: 97 : 1.7999999999999998
+I/ITR: 98 : 1.803
+I/ITR: 99 : 1.811
+I/TotalÂ Time:  in secs: 182.22199999999992
+I/AvgÂ Time:  in secs: 1.8222199999999993
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------------------------------------

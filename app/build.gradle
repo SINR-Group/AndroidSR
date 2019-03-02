@@ -6,6 +6,12 @@ allprojects {
         maven {
             url 'https://google.bintray.com/tensorflow'
         }
+        flatDir {
+            // Marks the directory as a repository for
+            // dependencies. Place the snpe-release.aar
+            // in the directory below.
+            dirs 'libs'
+        }
     }
 }
 
@@ -43,6 +49,7 @@ android {
         testImplementation 'junit:junit:4.12'
         androidTestImplementation 'com.android.support.test:runner:1.0.2'
         androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+        implementation(name: 'snpe-release', ext:'aar')
 
     }
 }
