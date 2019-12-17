@@ -1,6 +1,7 @@
 # How to Run the Android Project
 
 **Android SDK version==android-ndk-r17c**
+
 **SNPE version==snpe-1.25.0.287**
 
 
