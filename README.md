@@ -1,5 +1,9 @@
 # How to Run the Android Project
 
+**Android SDK version==android-ndk-r17c**
+
+
+
 ## Convert Keras Model to .pb (TensorFlow)
 * First, we need to use the keras_to_tensorflow.py file to convert the .h5(keras model) to .pb(tensorflow model).
 * eg: python keras_to_tensorflow.py --input_model=model1.h5 --output_model=new.pb
