@@ -15,6 +15,17 @@ tflite_convert
 ```
 * Alternatively, Use the python API : https://www.tensorflow.org/lite/convert/python_api
 
+## Convert Frozen Graph (.pb) to snapdragon Format (.dlc)
+* Install the SNPE SDK on the computer
+* Overview : https://developer.qualcomm.com/docs/snpe/overview.html
+* Please keep in mind not all mobiles are compatible with the snapdragon format.
+* Installation Guide : https://developer.qualcomm.com/docs/snpe/setup.html
+* After installing the SNPE and SDK, use the cmd: 
+```
+python ./bin/x86_64-linux-clang//snpe-tensorflow-to-dlc --graph $SNPE_ROOT/bin/x86_64-linux-clang/m.pb --input_dim "time_distributed_29_input" "3,30,120,240,3" --out_node "lstm_15/transpose_1" --dlc m.dlc --allow_unconsumed_nodes
+```
+Please get the name of the input tensor and output tensor from the frozen graph.
+
 ## Running the application
 * Store the .pb file in the asset folder inside the android project.
 * Give correct address to the model inside the MainActivity.java file.
