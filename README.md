@@ -1,4 +1,4 @@
-# How to Run the Android Project
+# How to Run the Application
 
 **Android SDK version==android-ndk-r17c**
 
